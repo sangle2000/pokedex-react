@@ -1,0 +1,44 @@
+- Các file trong folder con scss phải dùng dấu "_" để đặt tên vì theo quy tắc đó là các scss partial nên phải có dấu "_" trước tên.
+- Dùng @use thay cho @import
+- Sử dụng webkit để có thể đảm bảo độ tương thích của property tại các browser có version cũ hơn
+- createSlice (Redux Toolkit):
+    + Mục đích sử dụng: Để tạo ra sự thống nhất giữa action và reducer trong 1 object.
+    + Lợi ích: Vì đã được nhóm trong cùng 1 object, nên chỉ việc export ra và sử dụng, đồng thời "action types" cũng được sinh ra với tiền tố mặc định là trường "name" khi tạo "slice"
+
+- Tất cả reducer được tạo ra trong Slice sẽ phải được thêm vào configureStore.
+- extraReducers:
+    + Được sử dụng để xử lý các "action" được tạo ra bên ngoài slice hiện tại.
+    + Thay vì sử dụng các "reducers" thông thường (được định nghĩa trong thuộc tính "reducers"), "extraReducers" cho phép lắng nghe và phản hồi các "action" được tạo từ các nguồn khác, chẳng hạn như "thunk" hoặc các slice khác.
+    + builder:
+        + Là một đối tượng mà Redux Toolkit cung cấp, giúp thêm các case cụ thể vào reducer
+        + Mỗi case được liên kết với một "action type" nhất định (ví dụ trong project getInitialPokemonData.fulfilled)
+    + getInitialPokemonData.fulfilled:
+        + Đây là 1 action được tự động tạo ra khi sử dụng createAsyncThunk.
+        + Khi một tác vụ bất đồng bộ (async operation) kết thúc thành công, action fulfilled sẽ được kích hoạt.
+- createAsyncThunk dùng để xử lý các tác vụ bất đồng bộ, mỗi action sẽ trải qua 3 trạng thái chính:
+    + pending (Đang chờ xử lý):
+        + Trạng thái này được kích hoạt ngay khi tác vụ bất đồng bộ bắt đầu thực hiện.
+        + Đây là lúc có thể hiển thị trạng thái tải (loading) hoặc thực hiện các hành động khác để báo rằng dữ liệu đang được tải về.
+    + fulfilled (Thành công):
+        + Trạng thái này được kích hoạt khi tác vụ bất đồng bộ hoàn tất thành công.
+        + action.payload sẽ chứa dữ liệu mà tác vụ trả về.
+        + Đây là lúc cập nhật dữ liệu vào Redux store.
+    + rejected (Thất bại):
+        + Trạng thái này được kích hoạt khi tác vụ bất đồng bộ bị lỗi (ví dụ: kết nối API thất bại hoặc server trả về lỗi)
+        + action.error sẽ chứa thông tin lỗi, cho phép xử lý hoặc hiển thị thông báo lỗi cho người dùng.
+
+- Dùng debounce trong tìm kiếm:
+    + Hàm debounce có các tham số sau:
+        + timer:
+            + Biến "timer" lưu lại ID của "setTimeout" hiện tại
+            + Mỗi khi hàm được gọi, "clearTimeout(timer") xóa bộ đếm thời gian trước đó, đảm bảo không thực thi "fn" nếu người dùng vẫn đang nhập tìm kiếm.
+
+        + setTimeout:
+            + Khi không có thêm lần gọi nào trong khoảng thời gian "timeout", hàm "fn" mới được thực thi
+
+        + fn.apply(this, args):
+            + Gọi hàm "fn" với ngữ cảnh ("this") và các tham số ("args") được truyền vào.
+
+    + Lợi ích trong tìm kiếm:
+        + Trong quá trình nhập liệu, nếu gọi trực tiếp hàm "getPokemon", mỗi lần nhấn phím sẽ thực hiện lọc dữ liệu hoặc gửi yêu cầu (trong trường hợp sử dụng API). Điều này gây ra nhiều xử lý không cần thiết.
+        + "debounce" đảm bảo rằng hàm "getPokemon" chỉ được gọi sau khi người dùng dừng nhập liệu một khoảng thời gian nhất định ("timeout"). Điều này giúp giảm thiểu số lần xử lý và cải thiện hiệu suất.
