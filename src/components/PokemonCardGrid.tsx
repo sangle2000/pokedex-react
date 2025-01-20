@@ -6,6 +6,7 @@ import {useAppDispatch} from "../app/hooks.ts";
 import {addToCompare} from "../app/slices/PokemonSlice.ts";
 import {setToast} from "../app/slices/AppSlice.ts";
 import {addPokemonToList} from "../app/reducers/addPokemonToList.ts";
+import {removePokemon} from "../app/reducers/removePokemonFromUserList.ts";
 
 function PokemonCardGrid({pokemon}: { pokemon: userPokemonType[] }) {
     const location = useLocation();
@@ -35,10 +36,12 @@ function PokemonCardGrid({pokemon}: { pokemon: userPokemonType[] }) {
                                             location.pathname.includes("/pokemon") || location.pathname.includes("/search") ?
                                                 (
                                                     <FaPlus className="plus" onClick={() => {
-                                                        console.log(data)
                                                         dispatch(addPokemonToList(data))
                                                     }}/>
-                                                ) : <FaTrash className="trash"/>
+                                                ) : <FaTrash className="trash" onClick={async () => {
+                                                    await dispatch(removePokemon({id: data.firebaseId!}))
+                                                    dispatch(setToast("Pokemon removed successfully."))
+                                                }}/>
                                         }
                                     </div>
 

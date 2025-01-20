@@ -1,6 +1,18 @@
 import { MdOutlinePowerSettingsNew } from "react-icons/md";
+import {useAppDispatch} from "../app/hooks.ts";
+import {firebaseAuth} from "../utils/FirebaseConfig.ts";
+import { signOut } from "firebase/auth"
+import {setToast, setUserStatus} from "../app/slices/AppSlice.ts";
 
 function Footer() {
+    const dispatch = useAppDispatch();
+
+    const handleLogout = () => {
+        signOut(firebaseAuth)
+        dispatch(setUserStatus(undefined))
+        dispatch(setToast("Logged out successfully from Firebase"))
+    }
+
     return (
         <>
             <footer>
@@ -19,7 +31,9 @@ function Footer() {
                 <div
                     className="block"
                 >
-                    <MdOutlinePowerSettingsNew />
+                    <MdOutlinePowerSettingsNew
+                        onClick={handleLogout}
+                    />
                 </div>
             </footer>
         </>

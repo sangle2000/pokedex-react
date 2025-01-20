@@ -1,14 +1,16 @@
-import {generatedPokemonType, PokemonTypeInitialState, userPokemonType} from "../../utils/Types.ts";
-import {createSlice, PayloadAction} from "@reduxjs/toolkit";
+import {generatedPokemonType, PokemonTypeInitialState} from "../../utils/Types.ts";
+import {createSlice} from "@reduxjs/toolkit";
 import {getInitialPokemonData} from "../reducers/getInitialPokemonData.ts";
 import {getPokemonData} from "../reducers/getPokemonData.ts";
 import {getUserPokemon} from "../reducers/getUserPokemon.ts";
+import {removePokemon} from "../reducers/removePokemonFromUserList.ts";
 
 const initialState: PokemonTypeInitialState = {
     allPokemon: undefined,
     randomPokemon: undefined,
     compareQueue: [],
     userPokemon: [],
+    currentPokemon: undefined,
 }
 
 export const PokemonSlice = createSlice({
@@ -40,7 +42,11 @@ export const PokemonSlice = createSlice({
             const queue = [...state.compareQueue];
             queue.splice(index, 1);
             state.compareQueue = queue;
-        }
+        },
+
+        setCurrentPokemon: (state, action) => {
+            state.currentPokemon = action.payload;
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -55,9 +61,20 @@ export const PokemonSlice = createSlice({
 
         builder
             .addCase(getUserPokemon.fulfilled, (state: PokemonTypeInitialState, action) => {
-                state.userPokemon = action.payload;
+                state.userPokemon = action.payload!;
+            })
+
+        builder
+            .addCase(removePokemon.fulfilled, (state, action) => {
+                const userPokemon = [...state.userPokemon]
+                const index =  userPokemon.findIndex((pokemon) => {
+                    return pokemon.firebaseId === action.payload!.id
+                })
+
+                userPokemon.splice(index, 1)
+                state.userPokemon = userPokemon;
             })
     }
 })
 
-export const {addToCompare, removeFromCompare} = PokemonSlice.actions;
+export const {addToCompare, removeFromCompare, setCurrentPokemon} = PokemonSlice.actions;

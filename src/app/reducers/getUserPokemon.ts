@@ -7,7 +7,7 @@ import {defaultImages, images} from "../../utils/getPokemonImages.ts";
 
 export const getUserPokemon = createAsyncThunk(
     "pokemon/userList",
-    async (args, { getState }) => {
+    async (_, { getState }) => {
         try {
             const {
                 app: { userInfo }
